@@ -1,3 +1,42 @@
+
+
+const IdSelector = (id)=>{
+    return document.getElementById(id);
+}
+
+const error_handler = IdSelector("heroku-configurer-error-msg");
+const app_name = IdSelector("app-name");
+const file = IdSelector("heroku-configurer-file");
+const selector = IdSelector("select-file");
+const file_name = IdSelector("file-name");
+const file_size = IdSelector("file-size");
+const progress = IdSelector("uploading-section");
+const btn = IdSelector("heroku-configurer-btn");
+const close_btn = IdSelector("close-extension");
+const main_progress = IdSelector("main-brainstorm");
+
+const SupportedPlatforms = {
+    heroku : {
+        name : "Heroku",
+        login_redirect : "https://dashboard.heroku.com",
+        dashboard : "https://dashboard,heroku.com"
+    },
+    vercel : {
+        name : "Vercel",
+        login_redirect : null,
+        dashboard : nulll
+    },
+    netlify : {
+        name : "Netlify",
+        login_redirect : null,
+        dashboard : null
+    }
+}
+
+const Initialize = ()=>{
+
+}
+
 const HerokuConfigurerHandler = ()=>{
     error_handler.innerHTML = "Importing...";
     error_handler.style.color = "yellow";
@@ -19,9 +58,6 @@ const HerokuConfigurerHandler = ()=>{
             }
         }
     }
-}
-const IdSelector = (id)=>{
-    return document.getElementById(id);
 }
 
 continueUpload = (name, file, ext)=>{
@@ -120,26 +156,16 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse)=>{
         });
     }
 });
-chrome.tabs.query({url : "https://dashboard.heroku.com/*"}, (tabs)=>{
-    if(tabs.length < 1){
-        error_handler.innerHTML = `You are not logged in to heroku in any tab.`;
-        error_handler.style.color = "red";
-    }else{
-        var herokuTab = tabs[0];
-        chrome.tabs.sendMessage(herokuTab.id, {action : "load-apps"});    
-    }
-});
-
-const error_handler = IdSelector("heroku-configurer-error-msg");
-const app_name = IdSelector("app-name");
-const file = IdSelector("heroku-configurer-file");
-const selector = IdSelector("select-file");
-const file_name = IdSelector("file-name");
-const file_size = IdSelector("file-size");
-const progress = IdSelector("uploading-section");
-const btn = IdSelector("heroku-configurer-btn");
-const close_btn = IdSelector("close-extension");
-const main_progress = IdSelector("main-brainstorm");
+// chrome.tabs.query({url : "https://dashboard.heroku.com/*"}, (tabs)=>{
+//     if(tabs.length < 1){
+//         window.open('https://dashboard.heroku.com/', '_blank');
+//         error_handler.innerHTML = `You are not logged in to heroku in any tab.`;
+//         error_handler.style.color = "red";
+//     }else{
+//         var herokuTab = tabs[0];
+//         chrome.tabs.sendMessage(herokuTab.id, {action : "load-apps"});    
+//     }
+// });
 
 btn.addEventListener("click", (e)=>{ e.preventDefault(); HerokuConfigurerHandler(); });
 close_btn.addEventListener("click", (e)=>{window.close();})
