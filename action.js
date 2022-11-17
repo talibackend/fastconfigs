@@ -14,6 +14,8 @@ const progress = IdSelector("uploading-section");
 const btn = IdSelector("heroku-configurer-btn");
 const close_btn = IdSelector("close-extension");
 const main_progress = IdSelector("main-brainstorm");
+const select_platform = IdSelector("platform-name");
+const select_platform_btn = IdSelector("select-platform-btn");
 
 const SupportedPlatforms = {
     heroku : {
@@ -24,7 +26,7 @@ const SupportedPlatforms = {
     vercel : {
         name : "Vercel",
         login_redirect : null,
-        dashboard : nulll
+        dashboard : null
     },
     netlify : {
         name : "Netlify",
@@ -34,7 +36,13 @@ const SupportedPlatforms = {
 }
 
 const Initialize = ()=>{
+    let platform_keys = Object.keys(SupportedPlatforms);
 
+    select_platform.innerHTML = `<option value="">Select Platform</option>`;
+
+    for(let i = 0; i < platform_keys.length; i++){
+        select_platform.innerHTML += `<option value="${platform_keys[i]}">${SupportedPlatforms[platform_keys[i]].name}</option>`;
+    }
 }
 
 const HerokuConfigurerHandler = ()=>{
@@ -192,4 +200,6 @@ file.addEventListener("change", ()=>{
         }
     }
 })
+
+Initialize();
 
