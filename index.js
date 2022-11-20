@@ -51,7 +51,20 @@ chrome.runtime.onMessage.addListener((message, sender, response) => {
 
     }
     if (message.action == "load-apps") {
-        const accessToken = JSON.parse(localStorage['ember_simple_auth-session']).authenticated.access_token;
+        const platform = message.platform;
+        let splitted_access_token_path;
+        let access_token;
+        
+        switch(platform.auth.type){
+            case 'local_storage':
+                splitted_access_token_path = platform.auth.path.split('.');
+                
+                break;
+            default:
+                break;
+        }
+
+        // const accessToken = JSON.parse(localStorage['ember_simple_auth-session']).authenticated.access_token;
         if (!accessToken) {
             chrome.runtime.sendMessage({ status: 0, msg: "You're not logged in to heroku" });
         } else {

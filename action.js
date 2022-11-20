@@ -24,7 +24,24 @@ const SupportedPlatforms = {
         dashboard : "https://dashboard.heroku.com/",
         auth : {
             type : "local_storage",
-            path : "ember_simple_auth-session.authenticated.access_token"
+            path : {
+                "ember_simple_auth-session" : {
+                    action : ["parse"],
+                    type : "string",
+                    next : {
+                        authenticated : {
+                            action : null,
+                            type : "object",
+                            next : {
+                                access_token : {
+                                    action : null,
+                                    type : "string"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
         },
         fetch_app_payload : {
             url : "https://api.heroku.com/users/~/apps",
