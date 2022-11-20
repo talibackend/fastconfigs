@@ -21,7 +21,19 @@ const SupportedPlatforms = {
     heroku : {
         name : "Heroku",
         login_redirect : "https://dashboard.heroku.com/",
-        dashboard : "https://dashboard.heroku.com/"
+        dashboard : "https://dashboard.heroku.com/",
+        auth : {
+            type : "local_storage",
+            path : "ember_simple_auth-session.authenticated.access_token"
+        },
+        fetch_app_payload : {
+            url : "https://api.heroku.com/users/~/apps",
+            method : "GET",
+            headers : {
+                authorization : `Bearer fastconfigs-auth-token`,
+                accept: 'application/vnd.heroku+json; version=3.cedar-acm'
+            }
+        }
     },
     vercel : {
         name : "Vercel",
@@ -55,11 +67,46 @@ const CheckOrAttemptLogin = ()=>{
             // error_handler.innerHTML = `You are not logged in to ${CurrentPlatform.name} in any tab.`;
             // error_handler.style.color = "red";
         }
+        error_handler.innerHTML = `Loading apps...`;
+        error_handler.style.color = "orange";
         // var herokuTab = tabs[0];
-        // chrome.tabs.sendMessage(herokuTab.id, {action : "load-apps"}); 
-        alert('We will load apps dynamically here...');   
+        chrome.tabs.sendMessage(herokuTab.id, {action : "load-apps", platform : CurrentPlatform}); 
+        // alert('We will load apps dynamically here...');   
     });
 }
+
+chrome.runtime.onMessage.addListener((message, sender, sendResponse)=>{
+    if(message.msg != undefined){
+        error_handler.innerHTML = `${message.msg}`;
+    }
+    if(message.new_percent != undefined){
+        main_progress.style.width = `${message.new_percent}%`;
+        if(message.new_percent == 100){
+            main_progress.style.background = "green";
+        }
+    }
+    if(message.status == 0){
+        error_handler.style.color = "red";
+        main_progress.style.background = "red";
+    }
+    if(message.status == 1){
+        error_handler.style.color = "green";
+        setTimeout(() => {
+            app_name.value = "";
+            file.value = "";
+        }, 1000);
+    }
+    if(message.status == 2){
+        error_handler.style.color = "yellow";
+    }
+    if(message.type == "loaded-apps"){
+        app_name.innerHTML = "<option value=''>Select App</option>"
+        message.apps.forEach((each)=>{
+            app_name.innerHTML += `<option value='${each.id}'>${each.name}</option>`;
+        });
+    }
+});
+
 
 const SelectPlatformHandler = ()=>{
     if(select_platform.value === ""){
@@ -164,38 +211,6 @@ continueUpload = (name, file, ext)=>{
         }
     }
 }
-
-chrome.runtime.onMessage.addListener((message, sender, sendResponse)=>{
-    if(message.msg != undefined){
-        error_handler.innerHTML = `${message.msg}`;
-    }
-    if(message.new_percent != undefined){
-        main_progress.style.width = `${message.new_percent}%`;
-        if(message.new_percent == 100){
-            main_progress.style.background = "green";
-        }
-    }
-    if(message.status == 0){
-        error_handler.style.color = "red";
-        main_progress.style.background = "red";
-    }
-    if(message.status == 1){
-        error_handler.style.color = "green";
-        setTimeout(() => {
-            app_name.value = "";
-            file.value = "";
-        }, 1000);
-    }
-    if(message.status == 2){
-        error_handler.style.color = "yellow";
-    }
-    if(message.type == "loaded-apps"){
-        app_name.innerHTML = "<option value=''>Select App</option>"
-        message.apps.forEach((each)=>{
-            app_name.innerHTML += `<option value='${each.id}'>${each.name}</option>`;
-        });
-    }
-});
 
 btn.addEventListener("click", (e)=>{ e.preventDefault(); HerokuConfigurerHandler(); });
 close_btn.addEventListener("click", (e)=>{window.close();})
