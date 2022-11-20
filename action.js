@@ -119,7 +119,7 @@ const HerokuConfigurerHandler = ()=>{
     }
 }
 
-continueUpload = (name, file, ext)=>{
+continueUpload = (id, file, ext)=>{
     let reader = new FileReader();
     reader.readAsText(file);
     return reader.onload = ()=>{
@@ -171,13 +171,13 @@ continueUpload = (name, file, ext)=>{
         }
         const confirmation = confirm(alertString);
         if(confirmation == true){
-            chrome.tabs.query({url : "https://dashboard.heroku.com/*"}, (tabs)=>{
+            chrome.tabs.query({url : `${CurrentPlatform.dashboard}*`}, (tabs)=>{
                 if(tabs.length < 1){
                     error_handler.innerHTML = `You are not logged in to heroku in any tab.`;
                     error_handler.style.color = "red";
                 }else{
                     var herokuTab = tabs[0];
-                    chrome.tabs.sendMessage(herokuTab.id, {name, action : "import-app-config", config : configPayload});    
+                    chrome.tabs.sendMessage(herokuTab.id, {id, action : "import-app-config", config : configPayload, platform : CurrentPlatform});    
                 }
             });
         }
