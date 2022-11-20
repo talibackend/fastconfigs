@@ -3,6 +3,7 @@ const SupportedPlatforms = {
         name : "Heroku",
         login_redirect : "https://dashboard.heroku.com/",
         dashboard : "https://dashboard.heroku.com/",
+        success_redirect_url : "https://dashboard.heroku.com/apps/fastconfigs-app-id/settings",
         auth : {
             type : "local_storage",
             path : [
@@ -56,7 +57,7 @@ const SupportedPlatforms = {
                 accept: 'application/vnd.heroku+json; version=3.cedar-acm',
                 "Content-Type": "application/json"
             },
-            body : { "fastconfigs-env-key" : "fastconfigs-env-value" }
+            body : '{ "fastconfigs-env-key" : "fastconfigs-env-value" }'
         }
     },
     vercel : {

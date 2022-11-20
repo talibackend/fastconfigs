@@ -27,7 +27,7 @@ chrome.runtime.onMessage.addListener((message) => {
                 let payload2 = {
                     method: platform.configure_app_env_payload.method,
                     headers: ReplaceObjectValues(platform.configure_app_env_payload.headers, { "fastconfigs-auth-token" : access_token }),
-                    body: JSON.stringify(ReplaceObjectValues(platform.configure_app_env_payload.body, { "fastconfigs-env-key" : currentKey, "fastconfigs-env-value" : currentValue }))
+                    body: platform.configure_app_env_payload.body.replaceAll("fastconfigs-env-key", currentKey).replaceAll("fastconfigs-env-value", currentValue)
                 }
                 setTimeout(async () => {
                     return await fetch(`${platform.configure_app_env_payload.url.replaceAll('fastconfigs-app-id', app_id)}`, payload2).then((res) => {
@@ -41,8 +41,7 @@ chrome.runtime.onMessage.addListener((message) => {
                             if (i == configKeys.length - 1) {
                                 chrome.runtime.sendMessage({ status: 1, msg: `Importation completed, refreshing page.` });
                                 setTimeout(() => {
-                                    window.location = 'https://google.com';
-                                    // window.location = `https://dashboard.heroku.com/apps/${app_name}/settings`;
+                                    window.location = platform.configure_app_env_payload.success_redirect_url.replaceAll('fastconfigs-app-id', app_id);
                                 }, 1000);
                             }
                         }
