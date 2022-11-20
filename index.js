@@ -66,7 +66,7 @@ chrome.runtime.onMessage.addListener((message, sender, response) => {
         } else {
             const payload = {
                 method: platform.fetch_apps_payload.method,
-                headers: ReplaceObjectValues(platform.fetch_apps_payload.headers, 'fastconfigs-auth-token', access_token)
+                headers: ReplaceObjectValues(platform.fetch_apps_payload.headers, { "fastconfigs-auth-token" : access_token })
             }
             // fetch(platform.fetch_apps_payload.url, payload).then((res) => {
             //     res.json().then((json) => {
@@ -88,29 +88,31 @@ chrome.runtime.onMessage.addListener((message, sender, response) => {
 
 const ObjectTraverser = (object, path)=>{
     let return_value = object;
-    for(let i = 0; i < path.length; i++){
-        let current_path = path[i];
-        
-        if(!current_path.actions){
-            return_value = return_value[`${current_path.key}`];
-        }else{
-            let current_processed_value = return_value[`${current_path.key}`];
-            for(let j = 0; j < current_path.actions.length; j++){
-                switch(current_path.actions[j]){
-                    case 'json_parse':
-                        current_processed_value = JSON.parse(current_processed_value);
-                        break;
-                    default:
-                        break;
+    if(path.length > 0){
+        for(let i = 0; i < path.length; i++){
+            let current_path = path[i];
+            
+            if(!current_path.actions){
+                return_value = return_value[`${current_path.key}`];
+            }else{
+                let current_processed_value = return_value[`${current_path.key}`];
+                for(let j = 0; j < current_path.actions.length; j++){
+                    switch(current_path.actions[j]){
+                        case 'json_parse':
+                            current_processed_value = JSON.parse(current_processed_value);
+                            break;
+                        default:
+                            break;
+                    }
                 }
+                return_value = current_processed_value;
             }
-            return_value = current_processed_value;
         }
     }
     return return_value;
 }
 
-const ReplaceObjectValues = (object, search, value)=>{
+const ReplaceObjectValues = (object, pair)=>{
     let keys = Object.keys(object);
 
     for(let i = 0; i < keys.length; i++){
@@ -118,7 +120,11 @@ const ReplaceObjectValues = (object, search, value)=>{
         if(typeof(object[`${current_key}`]) == "object"){
             object[`${current_key}`] = ReplaceObjectValues(object[`${current_key}`], search, value);
         }else{
-            object[`${current_key}`] = object[`${current_key}`].replaceAll(search, value)
+            let pair_keys = Object.keys(pair);
+            for(let j = 0; j < pair_keys.length; j++){
+                let current_pair_key = pair_keys[j];
+                object[`${current_key}`] = object[`${current_key}`].replaceAll(current_pair_key, pair[`${current_pair_key}`]);
+            }
         }
     }
 

@@ -42,6 +42,9 @@ const SupportedPlatforms = {
                 }
             ],
         },
+        fetch_app_response : {
+            path : []
+        },
         fetch_apps_payload : {
             url : "https://api.heroku.com/users/~/apps",
             method : "GET",
@@ -80,18 +83,15 @@ const CheckOrAttemptLogin = ()=>{
         if(tabs.length < 1){
             window.open(CurrentPlatform.dashboard, '_blank');
             return;
-            // error_handler.innerHTML = `You are not logged in to ${CurrentPlatform.name} in any tab.`;
-            // error_handler.style.color = "red";
         }
         error_handler.innerHTML = `Loading apps...`;
         error_handler.style.color = "orange";
         var herokuTab = tabs[0];
-        chrome.tabs.sendMessage(herokuTab.id, {action : "load-apps", platform : CurrentPlatform}); 
-        // alert('We will load apps dynamically here...');   
+        chrome.tabs.sendMessage(herokuTab.id, {action : "load-apps", platform : CurrentPlatform});     
     });
 }
 
-chrome.runtime.onMessage.addListener((message, sender, sendResponse)=>{
+chrome.runtime.onMessage.addListener((message)=>{
     if(message.msg != undefined){
         error_handler.innerHTML = `${message.msg}`;
     }
