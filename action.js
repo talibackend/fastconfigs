@@ -43,7 +43,21 @@ const SupportedPlatforms = {
             ],
         },
         fetch_app_response : {
-            path : []
+            path : [],
+            name_path : [
+                {
+                    key : "name",
+                    actions : null,
+                    type : "string"
+                }
+            ],
+            id_path : [
+                {
+                    key : "id",
+                    actions : null,
+                    type : "string"
+                }
+            ]
         },
         fetch_apps_payload : {
             url : "https://api.heroku.com/users/~/apps",
@@ -116,10 +130,11 @@ chrome.runtime.onMessage.addListener((message)=>{
         error_handler.style.color = "yellow";
     }
     if(message.type == "loaded-apps"){
-        app_name.innerHTML = "<option value=''>Select App</option>"
-        message.apps.forEach((each)=>{
-            app_name.innerHTML += `<option value='${each.id}'>${each.name}</option>`;
-        });
+        console.log(message.apps);
+        // app_name.innerHTML = "<option value=''>Select App</option>"
+        // message.apps.forEach((each)=>{
+        //     app_name.innerHTML += `<option value='${each.id}'>${each.name}</option>`;
+        // });
     }
 });
 

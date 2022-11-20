@@ -68,65 +68,18 @@ chrome.runtime.onMessage.addListener((message, sender, response) => {
                 method: platform.fetch_apps_payload.method,
                 headers: ReplaceObjectValues(platform.fetch_apps_payload.headers, { "fastconfigs-auth-token" : access_token })
             }
-            // fetch(platform.fetch_apps_payload.url, payload).then((res) => {
-            //     res.json().then((json) => {
-            //         if (json.length < 1) {
-            //             chrome.runtime.sendMessage({ status: 0, msg: "Unable to retrieve apps" });
-            //         } else {
-            //             chrome.runtime.sendMessage({ type: 'loaded-apps', apps: json });
-            //         }
-            //     }).catch(err => {
-            //         chrome.runtime.sendMessage({ status: 0, msg: "Unable to retrieve apps" });
-            //     })
-            // }).catch(err => {
-            //     chrome.runtime.sendMessage({ status: 0, msg: "Unable to retrieve apps" });
-            // })
+            fetch(platform.fetch_apps_payload.url, payload).then((res) => {
+                res.json().then((json) => {
+                    chrome.runtime.sendMessage({ type: 'loaded-apps', apps: ObjectTraverser(json, platform.fetch_app_response.path) });
+                }).catch(err => {
+                    chrome.runtime.sendMessage({ status: 0, msg: "Unable to retrieve apps" });
+                })
+            }).catch(err => {
+                chrome.runtime.sendMessage({ status: 0, msg: "Unable to retrieve apps" });
+            })
         }
-
+        if(message.action == "get-helper-functions"){
+            chrome.runtime.sendMessage([ObjectTraverser, ReplaceObjectValues]);
+        }
     }
 });
-
-const ObjectTraverser = (object, path)=>{
-    let return_value = object;
-    if(path.length > 0){
-        for(let i = 0; i < path.length; i++){
-            let current_path = path[i];
-            
-            if(!current_path.actions){
-                return_value = return_value[`${current_path.key}`];
-            }else{
-                let current_processed_value = return_value[`${current_path.key}`];
-                for(let j = 0; j < current_path.actions.length; j++){
-                    switch(current_path.actions[j]){
-                        case 'json_parse':
-                            current_processed_value = JSON.parse(current_processed_value);
-                            break;
-                        default:
-                            break;
-                    }
-                }
-                return_value = current_processed_value;
-            }
-        }
-    }
-    return return_value;
-}
-
-const ReplaceObjectValues = (object, pair)=>{
-    let keys = Object.keys(object);
-
-    for(let i = 0; i < keys.length; i++){
-        let current_key = keys[i];
-        if(typeof(object[`${current_key}`]) == "object"){
-            object[`${current_key}`] = ReplaceObjectValues(object[`${current_key}`], search, value);
-        }else{
-            let pair_keys = Object.keys(pair);
-            for(let j = 0; j < pair_keys.length; j++){
-                let current_pair_key = pair_keys[j];
-                object[`${current_key}`] = object[`${current_key}`].replaceAll(current_pair_key, pair[`${current_pair_key}`]);
-            }
-        }
-    }
-
-    return object;
-}
