@@ -20,8 +20,8 @@ const select_platform_btn = IdSelector("select-platform-btn");
 const SupportedPlatforms = {
     heroku : {
         name : "Heroku",
-        login_redirect : "https://dashboard.heroku.com",
-        dashboard : "https://dashboard,heroku.com"
+        login_redirect : "https://dashboard.heroku.com/",
+        dashboard : "https://dashboard.heroku.com/"
     },
     vercel : {
         name : "Vercel",
@@ -35,6 +35,8 @@ const SupportedPlatforms = {
     }
 }
 
+let CurrentPlatform;
+
 const Initialize = ()=>{
     let platform_keys = Object.keys(SupportedPlatforms);
 
@@ -43,6 +45,36 @@ const Initialize = ()=>{
     for(let i = 0; i < platform_keys.length; i++){
         select_platform.innerHTML += `<option value="${platform_keys[i]}">${SupportedPlatforms[platform_keys[i]].name}</option>`;
     }
+}
+
+const CheckOrAttemptLogin = ()=>{
+    chrome.tabs.query({ url : `${CurrentPlatform.dashboard}*` }, (tabs)=>{
+        if(tabs.length < 1){
+            window.open(CurrentPlatform.dashboard, '_blank');
+            return;
+            // error_handler.innerHTML = `You are not logged in to ${CurrentPlatform.name} in any tab.`;
+            // error_handler.style.color = "red";
+        }
+        // var herokuTab = tabs[0];
+        // chrome.tabs.sendMessage(herokuTab.id, {action : "load-apps"}); 
+        alert('We will load apps dynamically here...');   
+    });
+}
+
+const SelectPlatformHandler = ()=>{
+    if(select_platform.value === ""){
+        error_handler.innerHTML = "Please select a platform to continue";
+        error_handler.style.color = "red";
+        return;
+    }
+    if(!SupportedPlatforms[`${select_platform.value}`]){
+        error_handler.innerHTML = "Invalid platform selected";
+        error_handler.style.color = "red";
+        return;
+    }
+    error_handler.innerHTML = "";
+    CurrentPlatform = SupportedPlatforms[`${select_platform.value}`];
+    CheckOrAttemptLogin();
 }
 
 const HerokuConfigurerHandler = ()=>{
@@ -164,20 +196,12 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse)=>{
         });
     }
 });
-// chrome.tabs.query({url : "https://dashboard.heroku.com/*"}, (tabs)=>{
-//     if(tabs.length < 1){
-//         window.open('https://dashboard.heroku.com/', '_blank');
-//         error_handler.innerHTML = `You are not logged in to heroku in any tab.`;
-//         error_handler.style.color = "red";
-//     }else{
-//         var herokuTab = tabs[0];
-//         chrome.tabs.sendMessage(herokuTab.id, {action : "load-apps"});    
-//     }
-// });
 
 btn.addEventListener("click", (e)=>{ e.preventDefault(); HerokuConfigurerHandler(); });
 close_btn.addEventListener("click", (e)=>{window.close();})
 selector.addEventListener("click", ()=>{file.click();})
+select_platform_btn.addEventListener("click", ()=>{ SelectPlatformHandler() })
+
 file.addEventListener("change", ()=>{
     error_handler.innerHTML = ``;
     let test_ext = file.files[0].name.split(".")[file.files[0].name.split(".").length - 1].toLowerCase();
