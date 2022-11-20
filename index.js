@@ -1,14 +1,23 @@
 console.log("Content script running....");
-chrome.runtime.onMessage.addListener((message, sender, response) => {
+chrome.runtime.onMessage.addListener((message) => {
     if (message.action == "import-app-config") {
         const config = message.config;
         const configKeys = Object.keys(config);
-        const app_name = message.name;
-        const accessToken = JSON.parse(localStorage['ember_simple_auth-session']).authenticated.access_token;
-        if (!accessToken) {
-            chrome.runtime.sendMessage({ status: 0, msg: "You're not logged in to heroku" });
+        const app_id = message.id;
+        const platform = message.platform;
+        let access_token;
+        
+        switch(platform.auth.type){
+            case 'local_storage':
+                access_token = ObjectTraverser(localStorage, platform.auth.path)
+                break;
+            default:
+                break;
+        }
+
+        if (!access_token) {
+            chrome.runtime.sendMessage({ status: 0, msg: `You're not logged in to ${platform.name}` });
         } else {
-            const app_id = app_name;
             for (let i = 0; i < configKeys.length; i++) {
                 let currentKey = configKeys[i];
                 let currentValue = config[`${currentKey}`];
@@ -16,16 +25,12 @@ chrome.runtime.onMessage.addListener((message, sender, response) => {
                 currentPayload[`${currentKey}`] = currentValue;
                 chrome.runtime.sendMessage({ status: 2, msg: `Importing ${currentKey}...` });
                 let payload2 = {
-                    method: "PATCH",
-                    headers: {
-                        authorization: `Bearer ${accessToken}`,
-                        accept: 'application/vnd.heroku+json; version=3.cedar-acm',
-                        "Content-Type": "application/json"
-                    },
-                    body: JSON.stringify(currentPayload)
+                    method: platform.configure_app_env_payload.method,
+                    headers: ReplaceObjectValues(platform.configure_app_env_payload.headers, { "fastconfigs-auth-token" : access_token }),
+                    body: JSON.stringify(ReplaceObjectValues(platform.configure_app_env_payload.body, { "fastconfigs-env-key" : currentKey, "fastconfigs-env-value" : currentValue }))
                 }
                 setTimeout(async () => {
-                    return await fetch(`https://api.heroku.com/apps/${app_id}/config-vars`, payload2).then((res) => {
+                    return await fetch(`${platform.configure_app_env_payload.url.replaceAll('fastconfigs-app-id', app_id)}`, payload2).then((res) => {
                         if (res.status != 200) {
                             chrome.runtime.sendMessage({ status: 0, msg: `Failed to import ${currentKey}` });
                             i -= i;
@@ -36,7 +41,8 @@ chrome.runtime.onMessage.addListener((message, sender, response) => {
                             if (i == configKeys.length - 1) {
                                 chrome.runtime.sendMessage({ status: 1, msg: `Importation completed, refreshing page.` });
                                 setTimeout(() => {
-                                    window.location = `https://dashboard.heroku.com/apps/${app_name}/settings`;
+                                    window.location = 'https://google.com';
+                                    // window.location = `https://dashboard.heroku.com/apps/${app_name}/settings`;
                                 }, 1000);
                             }
                         }
