@@ -24,26 +24,25 @@ const SupportedPlatforms = {
         dashboard : "https://dashboard.heroku.com/",
         auth : {
             type : "local_storage",
-            path : {
-                "ember_simple_auth-session" : {
-                    action : ["parse"],
-                    type : "string",
-                    next : {
-                        authenticated : {
-                            action : null,
-                            type : "object",
-                            next : {
-                                access_token : {
-                                    action : null,
-                                    type : "string"
-                                }
-                            }
-                        }
-                    }
+            path : [
+                {
+                    key : "ember_simple_auth-session",
+                    actions : ["json_parse"],
+                    type : "string"
+                },
+                {
+                    key : "authenticated",
+                    action : null,
+                    type : "object"
+                },
+                {
+                    key : "access_token",
+                    action : null,
+                    type : "string"
                 }
-            }
+            ],
         },
-        fetch_app_payload : {
+        fetch_apps_payload : {
             url : "https://api.heroku.com/users/~/apps",
             method : "GET",
             headers : {
@@ -86,7 +85,7 @@ const CheckOrAttemptLogin = ()=>{
         }
         error_handler.innerHTML = `Loading apps...`;
         error_handler.style.color = "orange";
-        // var herokuTab = tabs[0];
+        var herokuTab = tabs[0];
         chrome.tabs.sendMessage(herokuTab.id, {action : "load-apps", platform : CurrentPlatform}); 
         // alert('We will load apps dynamically here...');   
     });

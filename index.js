@@ -52,43 +52,66 @@ chrome.runtime.onMessage.addListener((message, sender, response) => {
     }
     if (message.action == "load-apps") {
         const platform = message.platform;
-        let splitted_access_token_path;
         let access_token;
         
         switch(platform.auth.type){
             case 'local_storage':
-                splitted_access_token_path = platform.auth.path.split('.');
-                
+                access_token = ObjectTraverser(localStorage, platform.auth.path)
+                console.log(access_token);
                 break;
             default:
                 break;
         }
 
         // const accessToken = JSON.parse(localStorage['ember_simple_auth-session']).authenticated.access_token;
-        if (!accessToken) {
-            chrome.runtime.sendMessage({ status: 0, msg: "You're not logged in to heroku" });
-        } else {
-            const payload = {
-                method: "GET",
-                headers: {
-                    authorization: `Bearer ${accessToken}`,
-                    accept: 'application/vnd.heroku+json; version=3.cedar-acm'
-                }
-            }
-            fetch(`https://api.heroku.com/users/~/apps`, payload).then((res) => {
-                res.json().then((json) => {
-                    if (json.length < 1) {
-                        chrome.runtime.sendMessage({ status: 0, msg: "Unable to retrieve apps" });
-                    } else {
-                        chrome.runtime.sendMessage({ type: 'loaded-apps', apps: json });
-                    }
-                }).catch(err => {
-                    chrome.runtime.sendMessage({ status: 0, msg: "Unable to retrieve apps" });
-                })
-            }).catch(err => {
-                chrome.runtime.sendMessage({ status: 0, msg: "Unable to retrieve apps" });
-            })
-        }
+        // if (!access_token) {
+        //     chrome.runtime.sendMessage({ status: 0, msg: "You're not logged in to heroku" });
+        // } else {
+        //     const payload = {
+        //         method: "GET",
+        //         headers: {
+        //             authorization: `Bearer ${access_token}`,
+        //             accept: 'application/vnd.heroku+json; version=3.cedar-acm'
+        //         }
+        //     }
+        //     fetch(`https://api.heroku.com/users/~/apps`, payload).then((res) => {
+        //         res.json().then((json) => {
+        //             if (json.length < 1) {
+        //                 chrome.runtime.sendMessage({ status: 0, msg: "Unable to retrieve apps" });
+        //             } else {
+        //                 chrome.runtime.sendMessage({ type: 'loaded-apps', apps: json });
+        //             }
+        //         }).catch(err => {
+        //             chrome.runtime.sendMessage({ status: 0, msg: "Unable to retrieve apps" });
+        //         })
+        //     }).catch(err => {
+        //         chrome.runtime.sendMessage({ status: 0, msg: "Unable to retrieve apps" });
+        //     })
+        // }
 
     }
 });
+
+const ObjectTraverser = (object, path)=>{
+    let return_value = object;
+    for(let i = 0; i < path.length; i++){
+        let current_path = path[i];
+        
+        if(!current_path.actions){
+            return_value = return_value[`${current_path.key}`];
+        }else{
+            let current_processed_value = return_value[`${current_path.key}`];
+            for(let j = 0; j < current_path.actions.length; j++){
+                switch(current_path.actions[j]){
+                    case 'json_parse':
+                        current_processed_value = JSON.parse(current_processed_value);
+                        break;
+                    default:
+                        break;
+                }
+            }
+            return_value = current_processed_value;
+        }
+    }
+    return return_value;
+}
