@@ -17,69 +17,6 @@ const main_progress = IdSelector("main-brainstorm");
 const select_platform = IdSelector("platform-name");
 const select_platform_btn = IdSelector("select-platform-btn");
 
-const SupportedPlatforms = {
-    heroku : {
-        name : "Heroku",
-        login_redirect : "https://dashboard.heroku.com/",
-        dashboard : "https://dashboard.heroku.com/",
-        auth : {
-            type : "local_storage",
-            path : [
-                {
-                    key : "ember_simple_auth-session",
-                    actions : ["json_parse"],
-                    type : "string"
-                },
-                {
-                    key : "authenticated",
-                    action : null,
-                    type : "object"
-                },
-                {
-                    key : "access_token",
-                    action : null,
-                    type : "string"
-                }
-            ],
-        },
-        fetch_app_response : {
-            path : [],
-            name_path : [
-                {
-                    key : "name",
-                    actions : null,
-                    type : "string"
-                }
-            ],
-            id_path : [
-                {
-                    key : "id",
-                    actions : null,
-                    type : "string"
-                }
-            ]
-        },
-        fetch_apps_payload : {
-            url : "https://api.heroku.com/users/~/apps",
-            method : "GET",
-            headers : {
-                authorization : `Bearer fastconfigs-auth-token`,
-                accept: 'application/vnd.heroku+json; version=3.cedar-acm'
-            }
-        }
-    },
-    vercel : {
-        name : "Vercel",
-        login_redirect : null,
-        dashboard : null
-    },
-    netlify : {
-        name : "Netlify",
-        login_redirect : null,
-        dashboard : null
-    }
-}
-
 let CurrentPlatform;
 
 const Initialize = ()=>{

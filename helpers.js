@@ -1,3 +1,77 @@
+const SupportedPlatforms = {
+    heroku : {
+        name : "Heroku",
+        login_redirect : "https://dashboard.heroku.com/",
+        dashboard : "https://dashboard.heroku.com/",
+        auth : {
+            type : "local_storage",
+            path : [
+                {
+                    key : "ember_simple_auth-session",
+                    actions : ["json_parse"],
+                    type : "string"
+                },
+                {
+                    key : "authenticated",
+                    action : null,
+                    type : "object"
+                },
+                {
+                    key : "access_token",
+                    action : null,
+                    type : "string"
+                }
+            ],
+        },
+        fetch_app_response : {
+            path : [],
+            name_path : [
+                {
+                    key : "name",
+                    actions : null,
+                    type : "string"
+                }
+            ],
+            id_path : [
+                {
+                    key : "id",
+                    actions : null,
+                    type : "string"
+                }
+            ]
+        },
+        fetch_apps_payload : {
+            url : "https://api.heroku.com/users/~/apps",
+            method : "GET",
+            headers : {
+                authorization : `Bearer fastconfigs-auth-token`,
+                accept: 'application/vnd.heroku+json; version=3.cedar-acm'
+            }
+        },
+        configure_app_env_payload : {
+            url : "https://api.heroku.com/apps/fastconfigs-app-id/config-vars",
+            method : "PATCH",
+            headers : {
+                authorization : `Bearer fastconfigs-auth-token`,
+                accept: 'application/vnd.heroku+json; version=3.cedar-acm',
+                "Content-Type": "application/json"
+            },
+            body : { "fastconfigs-env-key" : "fastconfigs-env-value" }
+        }
+    },
+    vercel : {
+        name : "Vercel",
+        login_redirect : null,
+        dashboard : null
+    },
+    netlify : {
+        name : "Netlify",
+        login_redirect : null,
+        dashboard : null
+    }
+}
+
+
 const ObjectTraverser = (object, path)=>{
     let return_value = object;
     if(path.length > 0){
