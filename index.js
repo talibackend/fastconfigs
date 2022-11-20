@@ -57,37 +57,31 @@ chrome.runtime.onMessage.addListener((message, sender, response) => {
         switch(platform.auth.type){
             case 'local_storage':
                 access_token = ObjectTraverser(localStorage, platform.auth.path)
-                console.log(access_token);
                 break;
             default:
                 break;
         }
-
-        // const accessToken = JSON.parse(localStorage['ember_simple_auth-session']).authenticated.access_token;
-        // if (!access_token) {
-        //     chrome.runtime.sendMessage({ status: 0, msg: "You're not logged in to heroku" });
-        // } else {
-        //     const payload = {
-        //         method: "GET",
-        //         headers: {
-        //             authorization: `Bearer ${access_token}`,
-        //             accept: 'application/vnd.heroku+json; version=3.cedar-acm'
-        //         }
-        //     }
-        //     fetch(`https://api.heroku.com/users/~/apps`, payload).then((res) => {
-        //         res.json().then((json) => {
-        //             if (json.length < 1) {
-        //                 chrome.runtime.sendMessage({ status: 0, msg: "Unable to retrieve apps" });
-        //             } else {
-        //                 chrome.runtime.sendMessage({ type: 'loaded-apps', apps: json });
-        //             }
-        //         }).catch(err => {
-        //             chrome.runtime.sendMessage({ status: 0, msg: "Unable to retrieve apps" });
-        //         })
-        //     }).catch(err => {
-        //         chrome.runtime.sendMessage({ status: 0, msg: "Unable to retrieve apps" });
-        //     })
-        // }
+        if (!access_token) {
+            chrome.runtime.sendMessage({ status: 0, msg: `You're not logged in to ${platform.name}` });
+        } else {
+            const payload = {
+                method: platform.fetch_apps_payload.method,
+                headers: ReplaceObjectValues(platform.fetch_apps_payload.headers, 'fastconfigs-auth-token', access_token)
+            }
+            // fetch(platform.fetch_apps_payload.url, payload).then((res) => {
+            //     res.json().then((json) => {
+            //         if (json.length < 1) {
+            //             chrome.runtime.sendMessage({ status: 0, msg: "Unable to retrieve apps" });
+            //         } else {
+            //             chrome.runtime.sendMessage({ type: 'loaded-apps', apps: json });
+            //         }
+            //     }).catch(err => {
+            //         chrome.runtime.sendMessage({ status: 0, msg: "Unable to retrieve apps" });
+            //     })
+            // }).catch(err => {
+            //     chrome.runtime.sendMessage({ status: 0, msg: "Unable to retrieve apps" });
+            // })
+        }
 
     }
 });
@@ -114,4 +108,19 @@ const ObjectTraverser = (object, path)=>{
         }
     }
     return return_value;
+}
+
+const ReplaceObjectValues = (object, search, value)=>{
+    let keys = Object.keys(object);
+
+    for(let i = 0; i < keys.length; i++){
+        let current_key = keys[i];
+        if(typeof(object[`${current_key}`]) == "object"){
+            object[`${current_key}`] = ReplaceObjectValues(object[`${current_key}`], search, value);
+        }else{
+            object[`${current_key}`] = object[`${current_key}`].replaceAll(search, value)
+        }
+    }
+
+    return object;
 }
