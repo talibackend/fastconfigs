@@ -130,11 +130,15 @@ chrome.runtime.onMessage.addListener((message)=>{
         error_handler.style.color = "yellow";
     }
     if(message.type == "loaded-apps"){
-        console.log(message.apps);
-        // app_name.innerHTML = "<option value=''>Select App</option>"
-        // message.apps.forEach((each)=>{
-        //     app_name.innerHTML += `<option value='${each.id}'>${each.name}</option>`;
-        // });
+        console.log(message);
+        document.getElementById("stage-1").style.display = "none";
+        document.getElementById("stage-2").style.display = "inline-flex";
+        // document.getElementById("stage-1").style.display = "none";
+        app_name.innerHTML = "<option value=''>Select App</option>";
+
+        message.apps.forEach((each)=>{
+            app_name.innerHTML += `<option value='${ObjectTraverser(each, CurrentPlatform.fetch_app_response.id_path)}'>${ObjectTraverser(each, CurrentPlatform.fetch_app_response.name_path)}</option>`;
+        });
     }
 });
 
