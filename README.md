@@ -45,6 +45,9 @@ hellow=world
 BASE_URL=https://example.com/
 ```
 
-### Suppoted Platforms
+### Supported Platforms
 ##### 1. Heroku
 ##### 2. Netlify
+
+<!-- ### What to expect...
+We are working on integrating other platforms as we go, so it  -->

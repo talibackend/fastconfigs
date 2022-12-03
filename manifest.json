@@ -1,8 +1,8 @@
 {
     "manifest_version" : 3,
     "name" : "FastConfigs",
-    "description" : "A simple tool used to setup a heroku app environment variable by simply importing an env, text of json file.",
-    "version" : "1.0.0",
+    "description" : "A simple tool used to setup an app environment variable on platforms like heroku and netlify by simply importing an env, text of json file.",
+    "version" : "0.0.0.1",
     "icons" : {
         "16" : "assets/logo.png",
         "48" : "assets/logo.png",
