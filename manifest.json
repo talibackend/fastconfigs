@@ -5,8 +5,8 @@
     "version" : "1.0.0",
     "content_scripts" : [
         {
-            "matches" : ["https://dashboard.heroku.com/*"],
-            "js" : ["index.js", "helpers.js"]
+            "matches" : ["https://dashboard.heroku.com/*", "https://app.netlify.com/*", "https://vercel.com/*"],
+            "js" : ["js/index.js", "js/helpers.js"]
         }
     ],
     "action" : {
@@ -17,6 +17,8 @@
         "tabs"
     ],
     "host_permissions": [
-        "https://dashboard.heroku.com/*"
+        "https://dashboard.heroku.com/*",
+        "https://app.netlify.com/*",
+        "https://vercel.com/*"
     ]
 }
