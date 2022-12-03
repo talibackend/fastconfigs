@@ -7,7 +7,7 @@ It allows you to add unlimited amount of environment variables using, json, txt 
 **The extension is not currently available on chrome store, so you have to install it manually by following the steps below.**
 
 1. Clone the respository by running `git clone https://github.com/talibackend/fastconfigs-core`.
-2. Head to your browser setting and extension.
+2. Open 'chrome://extensions/' in your browser.
 3. Click on "Load unpacked" button in the top bar.
 4. Select the folder that you cloned earlier.
 5. You can pin the extension to your browsers bar - **optional**.
