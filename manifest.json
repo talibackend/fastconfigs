@@ -3,6 +3,11 @@
     "name" : "FastConfigs",
     "description" : "A simple tool used to setup a heroku app environment variable by simply importing an env, text of json file.",
     "version" : "1.0.0",
+    "icons" : {
+        "16" : "assets/logo.png",
+        "48" : "assets/logo.png",
+        "128" : "assets/logo.png"
+    },
     "content_scripts" : [
         {
             "matches" : ["https://dashboard.heroku.com/*", "https://app.netlify.com/*", "https://vercel.com/*"],
