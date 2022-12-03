@@ -48,5 +48,8 @@ BASE_URL=https://example.com/
 ##### 1. Heroku
 ##### 2. Netlify
 
-<!-- ### What to expect...
-We are working on integrating other platforms as we go, so it  -->
+## What is next?
+1. We intend to keep integrate more hosting platforms, so we advice that you keep an eye on our repo.
+2. We will also be adding more features in the coming weeks, one of this features is environment variable exportation.
+
+### We hope you enjoy using our cool tool ❤️❤️❤️!
