@@ -22,7 +22,6 @@ It allows you to add unlimited amount of environment variables using, json, txt 
 #####
 - After successful login you can configure the apps hosted on that platform seamlessly.
 
-
 ### Supported Formats
 1. **JSON** : Fastconfigs supports JSON files given that all keys and values are string, below is an example.
 ```json
